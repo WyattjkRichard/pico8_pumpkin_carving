@@ -1,10 +1,11 @@
 function _init()
     poke(0x5f2d, 0x1)   -- enable mouse and keyboard
-    drawing_board = init_drawing_board()
     x, y = 64, 64
     interpolate = false
-    xoffset = 16
-    yoffset = 24
+
+    x_offset, y_offset = 16, 24
+    x_min, x_max, y_min, y_max = 1, 96, 1, 80
+    drawing_board = init_drawing_board()
 end
 
 function _update()
@@ -16,7 +17,7 @@ function _update()
             if interpolate then
                 interpolateAndDraw(prev_x, prev_y, x, y, drawing_board)
             else
-                drawing_board[x - xoffset][y - yoffset] = true
+                drawing_board[x - x_offset][y - y_offset] = true
                 interpolate = true;
             end 
         end
@@ -24,8 +25,6 @@ function _update()
         interpolate = false
         fill_enclosed_areas(drawing_board)
     end
-
-
 end
 
 function _draw()
@@ -39,14 +38,15 @@ function _draw()
 end
 
 function within_bounds(x, y)
-    return x > xoffset and x < 113 and y > yoffset and y < 105
+    return x > x_offset and x <= x_offset + x_max and y > y_offset and y <= y_offset + y_max
 end
 
 function init_drawing_board()
     local drawing_board = {}
-    for x = 1, 96 do
+
+    for x = x_min, x_max do
         drawing_board[x] = {}
-        for y = 1, 80 do
+        for y = y_min, y_max do
             drawing_board[x][y] = false
         end
     end
@@ -54,10 +54,10 @@ function init_drawing_board()
 end
 
 function draw_drawing_board(drawing_board)
-    for x = 1, 96 do
-        for y = 1, 80 do
+    for x = x_min, x_max do
+        for y = y_min, y_max do
             if drawing_board[x][y] then
-                pset(x + xoffset, y + yoffset, 0)
+                pset(x + x_offset, y + y_offset, 0)
             end
         end
     end
@@ -73,8 +73,8 @@ function interpolateAndDraw(x1, y1, x2, y2, drawing_board)
         local t = i / steps;
         local interpX = round(x1 + t * deltaX);
         local interpY = round(y1 + t * deltaY);
-        if (interpX > xoffset and interpX < 113 and interpY > yoffset and interpY < 105) then
-            drawing_board[interpX - xoffset][interpY - yoffset] = true;
+        if (interpX > x_offset and interpX <= x_offset + x_max and interpY > y_offset and interpY <= y_offset + y_max) then
+            drawing_board[interpX - x_offset][interpY - y_offset] = true;
         end
     end
 end
@@ -103,18 +103,20 @@ end
 function check_enclosed_areas(drawing_board)
     local visited = {}
     local enclosed_areas = {}
+
     local enclosed_areas_coords = {}
 
     -- need to copy the drawing board to visited
-    for x = 1, 96 do
+    for x = x_min, x_max do
         visited[x] = {}
-        for y = 1, 80 do
+        for y = y_min, y_max do
             visited[x][y] = drawing_board[x][y]
         end
     end
-    for x = 1, 96 do
-        for y = 1, 80 do
-            if visited[x][y] == false then
+
+    for x = x_min, x_max do
+        for y = y_min, y_max do
+            if not visited[x][y] then
                 visited, enclosed_areas_coords = fill_area(visited, {x=x, y=y})
                 if #enclosed_areas_coords > 0 then
                     add(enclosed_areas, enclosed_areas_coords[1])
@@ -140,7 +142,7 @@ function fill_area(drawing_board, coords)
         local current = stack[#stack]
 
         -- check up
-        if current.y > 1 then
+        if current.y > y_min then
             if drawing_board[current.x][current.y - 1] == false then
                 add(stack, {x = current.x, y = current.y - 1})
                 drawing_board[current.x][current.y - 1] = true
@@ -150,7 +152,7 @@ function fill_area(drawing_board, coords)
         end
         
         -- check down
-        if current.y < 80 then
+        if current.y < y_max then
             if drawing_board[current.x][current.y + 1] == false then
                 add(stack, {x = current.x, y = current.y + 1})
                 drawing_board[current.x][current.y + 1] = true
@@ -160,7 +162,7 @@ function fill_area(drawing_board, coords)
         end
 
         -- check left
-        if current.x > 1 then
+        if current.x > x_min then
             if drawing_board[current.x - 1][current.y] == false then
                 add(stack, {x = current.x - 1, y = current.y})
                 drawing_board[current.x - 1][current.y] = true
@@ -170,7 +172,7 @@ function fill_area(drawing_board, coords)
         end
 
         -- check right
-        if current.x < 96 then
+        if current.x < x_max then
             if drawing_board[current.x + 1][current.y] == false then
                 add(stack, { x = current.x + 1, y = current.y})
                 drawing_board[current.x + 1][current.y] = true
