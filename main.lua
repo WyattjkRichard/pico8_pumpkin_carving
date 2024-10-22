@@ -14,7 +14,7 @@ function _update()
     if stat(34) & 1 == 1 then
         if within_bounds(x, y) then
             if interpolate then
-                interpolateAndDraw(prev_x - xoffset, prev_y - yoffset, x - xoffset, y - yoffset, drawing_board)
+                interpolateAndDraw(prev_x, prev_y, x, y, drawing_board)
             else
                 drawing_board[x - xoffset][y - yoffset] = true
                 interpolate = true;
@@ -73,8 +73,8 @@ function interpolateAndDraw(x1, y1, x2, y2, drawing_board)
         local t = i / steps;
         local interpX = round(x1 + t * deltaX);
         local interpY = round(y1 + t * deltaY);
-        if (interpX >= 0 and interpX < 96 and interpY >= 0 and interpY < 80) then
-            drawing_board[interpX][interpY] = true;
+        if (interpX > xoffset and interpX < 113 and interpY > yoffset and interpY < 105) then
+            drawing_board[interpX - xoffset][interpY - yoffset] = true;
         end
     end
 end
@@ -188,3 +188,8 @@ function fill_area(drawing_board, coords)
     end
     return drawing_board, enclosed_areas
 end
+
+
+
+-- make a mask of the drawing board - use for flood fill and within bounds checks
+-- store drawing board as a 2d array of 8 bit numbers
