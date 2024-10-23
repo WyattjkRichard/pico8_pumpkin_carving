@@ -38,7 +38,8 @@ function _draw()
 end
 
 function within_bounds(x, y)
-    return x > x_offset and x <= x_offset + x_max and y > y_offset and y <= y_offset + y_max
+    -- set the bounds of the drawing board to include a 1px border around the drawing board to allow for an improved fill algorithm
+    return x > x_offset + 1 and x < x_offset + x_max and y > y_offset + 1 and y < y_offset + y_max
 end
 
 function init_drawing_board()
@@ -90,53 +91,40 @@ end
 
 -- Fill functions
 function fill_enclosed_areas(drawing_board)
-    local enclosed_areas = check_enclosed_areas(drawing_board)
 
-    for i = 1, #enclosed_areas do
-        fill_area(drawing_board, enclosed_areas[i])
-    end
-    return drawing_board
-end
-
-
-
-function check_enclosed_areas(drawing_board)
     local visited = {}
     local enclosed_areas = {}
 
     local enclosed_areas_coords = {}
 
     -- need to copy the drawing board to visited
+    
     for x = x_min, x_max do
         visited[x] = {}
         for y = y_min, y_max do
             visited[x][y] = drawing_board[x][y]
         end
     end
+    
+    visited = fill_area(visited)
 
     for x = x_min, x_max do
         for y = y_min, y_max do
-            if not visited[x][y] then
-                visited, enclosed_areas_coords = fill_area(visited, {x=x, y=y})
-                if #enclosed_areas_coords > 0 then
-                    add(enclosed_areas, enclosed_areas_coords[1])
-                end
+            if visited[x][y] == false then
+                drawing_board[x][y] = true
             end
         end
     end
-    return enclosed_areas
+
 end
 
 
-
-function fill_area(drawing_board, coords)
-    drawing_board[coords.x][coords.y] = true
+function fill_area(drawing_board)
+    drawing_board[1][1] = true
     
     local stack = {}
-    local enclosed = true
-    local enclosed_areas = {}
     
-    add(stack, {x=coords.x, y=coords.y})
+    add(stack, {x=1, y=1})
 
     while #stack > 0 do
         local current = stack[#stack]
@@ -147,8 +135,6 @@ function fill_area(drawing_board, coords)
                 add(stack, {x = current.x, y = current.y - 1})
                 drawing_board[current.x][current.y - 1] = true
             end
-        else
-            enclosed = false
         end
         
         -- check down
@@ -157,8 +143,6 @@ function fill_area(drawing_board, coords)
                 add(stack, {x = current.x, y = current.y + 1})
                 drawing_board[current.x][current.y + 1] = true
             end
-        else
-            enclosed = false
         end
 
         -- check left
@@ -167,8 +151,6 @@ function fill_area(drawing_board, coords)
                 add(stack, {x = current.x - 1, y = current.y})
                 drawing_board[current.x - 1][current.y] = true
             end
-        else
-            enclosed = false
         end
 
         -- check right
@@ -177,18 +159,13 @@ function fill_area(drawing_board, coords)
                 add(stack, { x = current.x + 1, y = current.y})
                 drawing_board[current.x + 1][current.y] = true
             end
-        else
-            enclosed = false
         end
 
         del(stack, current)
 
     end
     
-    if enclosed then
-        add(enclosed_areas, {x = coords.x, y = coords.y})
-    end
-    return drawing_board, enclosed_areas
+    return drawing_board
 end
 
 
