@@ -98,7 +98,6 @@ function fill_enclosed_areas(drawing_board)
     local enclosed_areas_coords = {}
 
     -- need to copy the drawing board to visited
-    
     for x = x_min, x_max do
         visited[x] = {}
         for y = y_min, y_max do
@@ -106,8 +105,10 @@ function fill_enclosed_areas(drawing_board)
         end
     end
     
+    -- run fill area on visited to fill everythin that is not enclosed
     visited = fill_area(visited)
 
+    -- fill all enclosed areas
     for x = x_min, x_max do
         for y = y_min, y_max do
             if visited[x][y] == false then
@@ -120,11 +121,57 @@ end
 
 
 function fill_area(drawing_board)
-    drawing_board[1][1] = true
-    
+    local first_row, last_row, empty = y_min, y_max, true
     local stack = {}
-    
-    add(stack, {x=1, y=1})
+
+    -- run through the drawing board and find the first and last rows that have filled pixels
+    for y = y_min, y_max do
+        for x = x_min, x_max do
+            if drawing_board[x][y] == true then
+                empty = false
+            end
+        end
+        if empty == false then
+            first_row = y - 2
+            break
+        end
+    end
+
+    empty = true
+
+    for y = y_max, y_min, -1 do
+        for x = x_min, x_max do
+            if drawing_board[x][y] == true then
+                empty = false
+            end
+        end
+        if empty == false then
+            last_row = y + 2
+            break
+        end
+    end
+
+    -- fill the empty first and last rows
+    if first_row > y_min then
+        for y = y_min, first_row do
+            for x = x_min, x_max do
+                drawing_board[x][y] = true
+            end
+        end
+        drawing_board[1][first_row+1] = true
+        add(stack, {x=1, y=first_row+1})
+    else
+        drawing_board[1][1] = true
+        add(stack, {x=1, y=1})
+    end
+
+    if last_row < y_max then
+        for y = last_row, y_max do
+            for x = x_min, x_max do
+                drawing_board[x][y] = true
+            end
+        end
+    end
 
     while #stack > 0 do
         local current = stack[#stack]
