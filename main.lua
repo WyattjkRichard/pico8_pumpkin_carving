@@ -19,7 +19,11 @@ function _update()
             else
                 drawing_board[x - x_offset][y - y_offset] = true
                 interpolate = true;
-            end 
+            end
+
+            if(stat(50) == -1) then
+                sfx(0, 0)
+            end
         end
     elseif interpolate then
         interpolate = false
@@ -32,9 +36,12 @@ function _draw()
     map()
     draw_drawing_board(drawing_board)
     circfill(x, y, 1, 8)
+    --[[
     print("x: "..x, 0, 0, 7)
     print("y: "..y, 0, 10, 7)
     print("btns: "..stat(34), 0, 20, 7)
+    print("note"..stat(50))
+    ]]
 end
 
 function within_bounds(x, y)
