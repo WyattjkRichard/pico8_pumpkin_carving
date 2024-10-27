@@ -26,6 +26,7 @@ function _draw()
     circfill(x, y, 1, 8)
     print("x: "..x, 0, 0, 7)
     print("y: "..y, 0, 10, 7)
+    print("btns: "..stat(34), 0, 20, 7)
     draw_drawing_board(drawing_board)
 end
 
@@ -50,7 +51,7 @@ function draw_drawing_board(drawing_board)
     end
 end
 
-function interpolateAndDraw(x1, y1, x2, y2, canvas)
+function interpolateAndDraw(x1, y1, x2, y2, drawing_board)
     local deltaX = x2 - x1;
     local deltaY = y2 - y1;
     local distance = sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -61,7 +62,7 @@ function interpolateAndDraw(x1, y1, x2, y2, canvas)
         local interpX = round(x1 + t * deltaX);
         local interpY = round(y1 + t * deltaY);
         if (interpX >= 0 and interpX < 128 and interpY >= 0 and interpY < 128) then
-            canvas[interpX][interpY] = true;
+            drawing_board[interpX][interpY] = true;
         end
     end
 end
