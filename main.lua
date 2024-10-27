@@ -35,8 +35,9 @@ function _draw()
     cls()
     map()
     draw_drawing_board(drawing_board)
-    circfill(x, y, 1, 8)
+    draw_cursor(x, y)
     --[[
+    circfill(x, y, 1, 8)
     print("x: "..x, 0, 0, 7)
     print("y: "..y, 0, 10, 7)
     print("btns: "..stat(34), 0, 20, 7)
@@ -69,6 +70,19 @@ function draw_drawing_board(drawing_board)
             end
         end
     end
+end
+
+function draw_cursor(x, y)
+    spr(1, x, y)
+    spr(2, x + 8, y)
+    spr(16, x, y + 8)
+    spr(17, x + 8, y + 8)
+    spr(18, x + 16, y + 8)
+    spr(33, x + 8, y + 16)
+    spr(34, x + 16, y + 16)
+    spr(35, x+ 24, y + 16)
+    spr(50, x + 16, y + 24)
+    spr(51, x + 24, y + 24)
 end
 
 function interpolateAndDraw(x1, y1, x2, y2, drawing_board)
