@@ -34,10 +34,12 @@ end
 function _draw()
     cls()
     map()
+    map(16, 0, 16, 8, 12, 12)
     draw_drawing_board(drawing_board)
     draw_cursor(x, y)
+    
+    -- circfill(x, y, 1, 8)
     --[[
-    circfill(x, y, 1, 8)
     print("x: "..x, 0, 0, 7)
     print("y: "..y, 0, 10, 7)
     print("btns: "..stat(34), 0, 20, 7)
@@ -46,8 +48,20 @@ function _draw()
 end
 
 function within_bounds(x, y)
+    -- x and y will be within a range of 0-127
+    center_x, center_y, width, height =  63, 64, 95, 75
+    pset()
+    -- Translate the mouse coordinates relative to the center of the ellipse
+    dx = x - center_x
+    dy = y - center_y
+    -- Calculate if the point is inside the ellipse using the standard ellipse formula
+    -- (dx^2 / (width / 2)^2) + (dy^2 / (height / 2)^2) <= 1
+    return (dx * dx) / ((width / 2) * (width / 2)) + (dy * dy) / ((height / 2) * (height / 2)) <= 1
+
+
     -- set the bounds of the drawing board to include a 1px border around the drawing board to allow for an improved fill algorithm
-    return x > x_offset + 1 and x < x_offset + x_max - 1 and y > y_offset + 1 and y < y_offset + y_max - 1
+    -- return x > x_offset + 1 and x < x_offset + x_max - 1 and y > y_offset + 1 and y < y_offset + y_max - 1
+
 end
 
 function init_drawing_board()
@@ -73,16 +87,16 @@ function draw_drawing_board(drawing_board)
 end
 
 function draw_cursor(x, y)
-    spr(1, x, y)
-    spr(2, x + 8, y)
-    spr(16, x, y + 8)
-    spr(17, x + 8, y + 8)
-    spr(18, x + 16, y + 8)
-    spr(33, x + 8, y + 16)
-    spr(34, x + 16, y + 16)
-    spr(35, x+ 24, y + 16)
-    spr(50, x + 16, y + 24)
-    spr(51, x + 24, y + 24)
+    spr(92, x, y)
+    spr(93, x + 8, y)
+    spr(108, x, y + 8)
+    spr(109, x + 8, y + 8)
+    spr(93, x + 16, y + 8)
+    spr(125, x + 8, y + 16)
+    spr(126, x + 16, y + 16)
+    spr(93, x+ 24, y + 16)
+    spr(142, x + 16, y + 24)
+    spr(143, x + 24, y + 24)
 end
 
 function interpolateAndDraw(x1, y1, x2, y2, drawing_board)
