@@ -7,7 +7,7 @@ function _init()
     x_min, x_max, y_min, y_max = 1, 96, 1, 80
     drawing_board = init_drawing_board()
 
-    -- menuitem(1, "save image", extcmd('screen'))
+    menuitem(1, "save image", save_image) -- cant pass parameters into callback function, drawing_board must be a global
 end
 
 function _update()
@@ -49,6 +49,15 @@ function _draw()
     print("btns: "..stat(34), 0, 20, 7)
     print("note"..stat(50))
     ]]
+end
+
+function save_image()
+    cls()
+    map()
+    map(16, 0, 16, 8, 12, 12)
+    draw_drawing_board(drawing_board)
+    flip()
+    extcmd('screen')
 end
 
 function within_bounds(x, y)
