@@ -6,6 +6,8 @@ function _init()
     x_offset, y_offset = 16, 24
     x_min, x_max, y_min, y_max = 1, 96, 1, 80
     drawing_board = init_drawing_board()
+
+    -- menuitem(1, "save image", extcmd('screen'))
 end
 
 function _update()
@@ -51,19 +53,13 @@ end
 
 function within_bounds(x, y)
     -- x and y will be within a range of 0-127
-    center_x, center_y, width, height =  63, 64, 95, 75
+    center_x, center_y, width, height =  64, 64, 93, 75
     pset()
     -- Translate the mouse coordinates relative to the center of the ellipse
     dx = x - center_x
     dy = y - center_y
     -- Calculate if the point is inside the ellipse using the standard ellipse formula
-    -- (dx^2 / (width / 2)^2) + (dy^2 / (height / 2)^2) <= 1
     return (dx * dx) / ((width / 2) * (width / 2)) + (dy * dy) / ((height / 2) * (height / 2)) <= 1
-
-
-    -- set the bounds of the drawing board to include a 1px border around the drawing board to allow for an improved fill algorithm
-    -- return x > x_offset + 1 and x < x_offset + x_max - 1 and y > y_offset + 1 and y < y_offset + y_max - 1
-
 end
 
 function init_drawing_board()
@@ -207,14 +203,14 @@ function fill_area(drawing_board)
     end
 
     empty = true
-    for x = y_max, y_min, -1 do
-        for x = x_min, x_max do
+    for x = x_max, x_min, -1 do
+        for y = y_min, y_max do
             if drawing_board[x][y] == true then
                 empty = false
             end
         end
         if empty == false then
-            if  x < x_max + 2 then
+            if  x < x_max - 2 then
                 last_column = x + 2
             end
             break
@@ -300,3 +296,7 @@ function fill_area(drawing_board)
     
     return drawing_board
 end
+
+-- issue where edges are not being filled in, assumption, edge is not being set correctly
+-- most notablly seen on the right edge of the screen
+-- if the last column is set lower then it should be this would explain the issues being seen.
