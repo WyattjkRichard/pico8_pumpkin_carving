@@ -24,6 +24,8 @@ function _update()
             if(stat(50) == -1) then
                 sfx(0, 0)
             end
+        else
+            interpolate = false
         end
     elseif interpolate then
         interpolate = false
